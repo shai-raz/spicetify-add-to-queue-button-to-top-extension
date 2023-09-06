@@ -22,10 +22,13 @@ function waitForElm(selector: string): Promise<Element> {
 function changeContextMenuOrder(): void {}
 
 async function main() {
-    waitForElm("#context-menu").then((elm: Element) => {
+    let element: Element;
+
+    while (!element || (element = waitForElm("#context-menu"))) {
+        // element = await waitForElm("#context-menu")
         console.log("Element is ready");
-        console.log(elm);
-    });
+        console.log(element);
+    }
 }
 
 export default main;
