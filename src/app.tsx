@@ -1,4 +1,4 @@
-function waitForElm(selector: string): Promise<Element> {
+function waitForElmToExist(selector: string): Promise<Element> {
     return new Promise((resolve) => {
         const element = document.querySelector(selector);
         if (element) {
@@ -19,15 +19,34 @@ function waitForElm(selector: string): Promise<Element> {
         });
     });
 }
-function changeContextMenuOrder(): void {}
+
+function waitForElmToDisappear(element: Element): Promise<void> {
+    return new Promise((resolve) => {
+        const observer = new MutationObserver((mutations) => {
+            if (!document.body.contains(element)) {
+                resolve();
+            }
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+        });
+    });
+}
+function changeContextMenuOrder(contextMenu: Element): void {
+    const children: HTMLCollection = contextMenu.children[0].children;
+    [children[0], children[2]] = [children[2], children[0]];
+}
 
 async function main() {
-    let element: Element;
-
-    while (!element || (element = waitForElm("#context-menu"))) {
-        // element = await waitForElm("#context-menu")
+    while (true) {
+        const contextMenu: Element = await waitForElmToExist("#context-menu");
         console.log("Element is ready");
-        console.log(element);
+        console.log(contextMenu);
+        changeContextMenuOrder(contextMenu);
+        await waitForElmToDisappear(contextMenu);
+        console.log("Element disappeared");
     }
 }
 
