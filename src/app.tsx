@@ -1,4 +1,4 @@
-function waitForElmToExist(selector: string): Promise<Element> {
+const waitForElmToExist = (selector: string): Promise<Element> => {
     return new Promise((resolve) => {
         const element = document.querySelector(selector);
         if (element) {
@@ -18,9 +18,9 @@ function waitForElmToExist(selector: string): Promise<Element> {
             subtree: true,
         });
     });
-}
+};
 
-function waitForElmToDisappear(element: Element): Promise<void> {
+const waitForElmToDisappear = (element: Element): Promise<void> => {
     return new Promise((resolve) => {
         const observer = new MutationObserver((mutations) => {
             if (!document.body.contains(element)) {
@@ -33,11 +33,35 @@ function waitForElmToDisappear(element: Element): Promise<void> {
             subtree: true,
         });
     });
-}
-function changeContextMenuOrder(contextMenu: Element): void {
-    const children: HTMLCollection = contextMenu.children[0].children;
-    [children[0], children[2]] = [children[2], children[0]];
-}
+};
+
+const findAddToQueueListElement = (listItems: HTMLCollection): HTMLLIElement | null => {
+    if (!listItems) return null;
+    let addToQueueElement: HTMLLIElement | null = null;
+
+    for (let item of listItems) {
+        const text = item.children[0].children[0].innerHTML;
+        if (text.toLowerCase() === "add to queue") {
+            addToQueueElement = item as HTMLLIElement;
+            break;
+        }
+    }
+
+    return addToQueueElement;
+};
+
+const changeContextMenuOrder = (contextMenu: Element): void => {
+    const ul: HTMLUListElement = contextMenu.children[0] as HTMLUListElement;
+    if (!ul) return;
+    ul.style.display = "flex";
+    ul.style.flexDirection = "column";
+    
+    const listItems: HTMLCollection = ul.children;
+    const addToQueueListElement: HTMLLIElement | null = findAddToQueueListElement(listItems);
+    if (!addToQueueListElement) return;
+
+    addToQueueListElement.style.order = "-1";
+};
 
 async function main() {
     while (true) {
